@@ -2,6 +2,7 @@
 const oldSite = "https://www.lokman.org";
 const imageUrl = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/images/lokman.png`;
 const mediaUrl = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/media-appearances/`;
+const writingsUrl = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/essays-and-other-writings/`;
 ---
 
 <!doctype html>
@@ -23,7 +24,7 @@ const mediaUrl = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/media-appearanc
             <nav aria-label="Primary navigation">
                 <a aria-current="page" href="./">about</a>
                 <a href={`${oldSite}/academic-work/`}>academic work</a>
-                <a href={`${oldSite}/select-essays-and-other-writings/`}>
+                <a href={writingsUrl}>
                     essays and other writings
                 </a>
                 <a href={mediaUrl}>media appearances</a>

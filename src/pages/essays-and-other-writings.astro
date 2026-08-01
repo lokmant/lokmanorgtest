@@ -1,48 +1,28 @@
 ---
-type Source = {
-  title: string;
-  id: string;
-  url: string;
-};
+type Source = { title: string; id: string; url: string };
 
 const sources: Source[] = [
-  { title: "Videos", id: "videos", url: "https://www.lokman.org/videos/" },
-  { title: "Podcasts", id: "podcasts", url: "https://www.lokman.org/podcasts/" },
-  { title: "News media", id: "news-media", url: "https://www.lokman.org/newspapers/" },
+  { title: "Essays", id: "essays", url: "https://www.lokman.org/essays/" },
+  { title: "Op-eds", id: "op-eds", url: "https://www.lokman.org/op-eds/" },
 ];
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 const homeUrl = `${basePath}/`;
-const writingsUrl = `${basePath}/essays-and-other-writings/`;
-
-function labelFor(listHtml: string) {
-  const years = [...listHtml.matchAll(/\b(?:19|20)\d{2}\b/g)].map((match) =>
-    Number(match[0]),
-  );
-  const newest = Math.max(...years);
-  const oldest = Math.min(...years);
-
-  if (!Number.isFinite(newest)) return "Archive";
-  return newest === oldest ? String(newest) : `${oldest}–${newest}`;
-}
 
 const sections = await Promise.all(
   sources.map(async (source) => {
     const response = await fetch(source.url);
-    if (!response.ok) {
-      throw new Error(`Could not load ${source.title} from ${source.url}`);
-    }
+    if (!response.ok) throw new Error(`Could not load ${source.title}`);
 
     const html = await response.text();
     const article = html.match(/<article\b[^>]*>([\s\S]*?)<\/article>/i)?.[1] ?? "";
-    const lists = article.match(/<ul\b[^>]*>[\s\S]*?<\/ul>/gi) ?? [];
+    const groups = article.match(/<ul\b[^>]*>[\s\S]*?<\/ul>/gi) ?? [];
 
     return {
       ...source,
-      groups: lists.map((list) => ({
-        label: labelFor(list),
-        html: list.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ""),
-      })),
+      groups: groups.map((group) =>
+        group.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ""),
+      ),
     };
   }),
 );
@@ -55,43 +35,37 @@ const sections = await Promise.all(
     <meta name="viewport" content="width=device-width" />
     <meta
       name="description"
-      content="Videos, podcasts, and news media featuring Lokman Tsui 徐洛文."
+      content="Essays and op-eds by Lokman Tsui 徐洛文."
     />
-    <title>Media appearances — Lokman Tsui 徐洛文</title>
+    <title>Essays and other writings — Lokman Tsui 徐洛文</title>
   </head>
 
   <body>
     <header class="site-header">
       <a class="site-title" href={homeUrl}>lokman tsui 徐洛文</a>
-
       <nav aria-label="Primary navigation">
         <a href={homeUrl}>about</a>
         <a href="https://www.lokman.org/academic-work/">academic work</a>
-        <a href={writingsUrl}>
+        <a aria-current="page" href={homeUrl + "essays-and-other-writings/"}>
           essays and other writings
         </a>
-        <a aria-current="page" href={homeUrl + "media-appearances/"}>
-          media appearances
-        </a>
+        <a href={homeUrl + "media-appearances/"}>media appearances</a>
       </nav>
     </header>
 
     <main>
       <article>
-        <h1>media appearances</h1>
-
-        <nav class="jump-links" aria-label="Media sections">
+        <h1>essays and other writings</h1>
+        <nav class="jump-links" aria-label="Writing sections">
           {sections.map((section) => <a href={`#${section.id}`}>{section.title}</a>)}
         </nav>
 
         {
           sections.map((section) => (
-            <section id={section.id} class="media-section">
+            <section id={section.id} class="writing-section">
               <h2>{section.title}</h2>
               {section.groups.map((group, index) => (
-                <div class="year-group">
-                  {section.groups.length > 1 && <h3>{group.label}</h3>}
-                  <div class="entries" set:html={group.html} />
+                <div class="entries" set:html={group}>
                   {index < section.groups.length - 1 && <hr />}
                 </div>
               ))}
@@ -111,7 +85,6 @@ const sections = await Promise.all(
 
 <style>
   :global(*) { box-sizing: border-box; }
-
   :global(body) {
     margin: 0;
     color: #1c1c1c;
@@ -120,46 +93,22 @@ const sections = await Promise.all(
     font-size: 18px;
     line-height: 1.65;
   }
-
-  .site-header, main, footer {
-    width: min(100% - 3rem, 1100px);
-    margin-inline: auto;
-  }
-
-  .site-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 2rem;
-    padding: 2rem 0;
-    border-bottom: 1px solid #ddd;
-  }
-
+  .site-header, main, footer { width: min(100% - 3rem, 1100px); margin-inline: auto; }
+  .site-header { display: flex; justify-content: space-between; gap: 2rem; padding: 2rem 0; border-bottom: 1px solid #ddd; }
   .site-title { color: inherit; font-weight: 700; text-decoration: none; white-space: nowrap; }
-
   nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.4rem 1.2rem; }
   a { color: #1b4f72; }
   nav a { color: inherit; text-decoration: none; }
   nav a:hover, nav a[aria-current="page"] { text-decoration: underline; }
-
   main { padding-block: 4rem; }
   article { max-width: 850px; }
   h1 { margin-top: 0; font-size: clamp(2.2rem, 6vw, 4rem); line-height: 1; font-weight: 400; }
   h2 { margin-top: 4rem; font-size: 2rem; font-weight: 400; }
-  h3 { margin: 2rem 0 0.75rem; font-size: 1.2rem; }
-
-  .jump-links {
-    justify-content: flex-start;
-    gap: 0.5rem 1.25rem;
-    padding: 1rem 0;
-    border-block: 1px solid #ddd;
-  }
-
+  .jump-links { justify-content: flex-start; gap: 0.5rem 1.25rem; padding: 1rem 0; border-block: 1px solid #ddd; }
   :global(.entries ul) { margin: 0; padding-left: 1.25rem; }
   :global(.entries li) { margin-block: 0.75rem; }
   hr { border: 0; border-top: 1px solid #ddd; margin: 2.5rem 0; }
-
   footer { display: flex; gap: 1rem; padding: 2rem 0 3rem; border-top: 1px solid #ddd; font-size: 0.9rem; }
-
   @media (max-width: 700px) {
     .site-header { display: block; }
     .site-header nav { justify-content: flex-start; margin-top: 1rem; }
