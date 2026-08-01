@@ -15,15 +15,33 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 const homeUrl = `${basePath}/`;
 const writingsUrl = `${basePath}/essays-and-other-writings/`;
 
-function labelFor(listHtml: string) {
-  const years = [...listHtml.matchAll(/\b(?:19|20)\d{2}\b/g)].map((match) =>
-    Number(match[0]),
-  );
-  const newest = Math.max(...years);
-  const oldest = Math.min(...years);
+function cleanList(listHtml: string) {
+  return listHtml.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
+}
 
-  if (!Number.isFinite(newest)) return "Archive";
-  return newest === oldest ? String(newest) : `${oldest}–${newest}`;
+function yearFor(listItem: string) {
+  const years = [...listItem.matchAll(/\b(?:19|20)\d{2}\b/g)];
+  return years.length ? Number(years.at(-1)?.[0]) : 0;
+}
+
+function groupNewsByYear(lists: string[]) {
+  const entriesByYear = new Map<number, string[]>();
+
+  for (const list of lists) {
+    const items = cleanList(list).match(/<li\b[^>]*>[\s\S]*?<\/li>/gi) ?? [];
+    for (const item of items) {
+      const year = yearFor(item);
+      entriesByYear.set(year, [...(entriesByYear.get(year) ?? []), item]);
+    }
+  }
+
+  return [...entriesByYear.entries()]
+    .sort(([firstYear], [secondYear]) => secondYear - firstYear)
+    .map(([year, items]) => ({
+      year,
+      label: year ? String(year) : "Archive",
+      html: `<ul>${items.join("")}</ul>`,
+    }));
 }
 
 const sections = await Promise.all(
@@ -37,12 +55,16 @@ const sections = await Promise.all(
     const article = html.match(/<article\b[^>]*>([\s\S]*?)<\/article>/i)?.[1] ?? "";
     const lists = article.match(/<ul\b[^>]*>[\s\S]*?<\/ul>/gi) ?? [];
 
+    const groups = source.id === "news-media"
+      ? groupNewsByYear(lists)
+      : lists.map((list) => ({ year: 0, label: "", html: cleanList(list) }));
+
     return {
       ...source,
-      groups: lists.map((list) => ({
-        label: labelFor(list),
-        html: list.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ""),
-      })),
+      groups: source.id === "news-media" ? groups.filter((group) => group.year >= 2022) : groups,
+      earlierGroups: source.id === "news-media"
+        ? groups.filter((group) => group.year > 0 && group.year < 2022)
+        : [],
     };
   }),
 );
@@ -90,11 +112,25 @@ const sections = await Promise.all(
               <h2>{section.title}</h2>
               {section.groups.map((group, index) => (
                 <div class="year-group">
-                  {section.groups.length > 1 && <h3>{group.label}</h3>}
+                  {section.id === "news-media" && <h3>{group.label}</h3>}
                   <div class="entries" set:html={group.html} />
                   {index < section.groups.length - 1 && <hr />}
                 </div>
               ))}
+              {
+                section.earlierGroups.length > 0 && (
+                  <details class="earlier-news">
+                    <summary>Earlier news media (2021 and earlier)</summary>
+                    {section.earlierGroups.map((group, index) => (
+                      <div class="year-group">
+                        <h3>{group.label}</h3>
+                        <div class="entries" set:html={group.html} />
+                        {index < section.earlierGroups.length - 1 && <hr />}
+                      </div>
+                    ))}
+                  </details>
+                )
+              }
             </section>
           ))
         }
@@ -157,6 +193,8 @@ const sections = await Promise.all(
   :global(.entries ul) { margin: 0; padding-left: 1.25rem; }
   :global(.entries li) { margin-block: 0.75rem; }
   hr { border: 0; border-top: 1px solid #ddd; margin: 2.5rem 0; }
+  .earlier-news { margin-top: 2rem; border-top: 1px solid #ddd; }
+  .earlier-news summary { padding: 1rem 0; cursor: pointer; font-weight: 700; }
 
   footer { display: flex; gap: 1rem; padding: 2rem 0 3rem; border-top: 1px solid #ddd; font-size: 0.9rem; }
 
