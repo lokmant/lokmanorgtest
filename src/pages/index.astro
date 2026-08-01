@@ -33,30 +33,38 @@ const academicUrl = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/academic-wor
 
         <main>
             <article>
-                <h1>about</h1>
+                <section class="hero">
+                    <div>
+                        <h1>Lokman Tsui 徐洛文</h1>
+                        <p class="tagline">
+                            Writer, researcher, and amateur activist on free
+                            expression, authoritarianism, and technology.
+                        </p>
+                        <p class="roles">
+                            Assistant Professor, Graduate Institute of Journalism,
+                            National Taiwan University<br />
+                            Senior Research Fellow, Citizen Lab, University of Toronto
+                        </p>
+                    </div>
 
-                <figure>
-                    <img
-                        src={imageUrl}
-                        alt="Portrait of Lokman Tsui"
-                        width="800"
-                    />
-                </figure>
+                    <figure>
+                        <img
+                            src={imageUrl}
+                            alt="Portrait of Lokman Tsui"
+                            width="800"
+                        />
+                    </figure>
+                </section>
 
                 <p>
-                    My name is Lokman Tsui 徐洛文. I am a writer, (recovering)
-                    academic, and amateur activist on issues of free speech and
-                    authoritarianism, with a focus on new technologies and Hong
-                    Kong. I’m working on a book, a personal history of
-                    authoritarianism at home.
+                    My work focuses on free expression and authoritarianism,
+                    with particular attention to new technologies and Hong Kong.
+                    I’m working on a book, a personal history of authoritarianism
+                    at home.
                 </p>
 
                 <p>
-                    I am currently an Assistant Professor at the Graduate
-                    Institute of Journalism, National Taiwan University. I am
-                    also a Senior Research Fellow with the Citizen Lab at the
-                    Munk School of Global Affairs and Public Policy of the
-                    University of Toronto. Before I joined NTU, I was an
+                    Before I joined National Taiwan University, I was an
                     Assistant Professor at the School of Journalism and
                     Communication of the Chinese University of Hong Kong
                     (2014–2021).
@@ -71,7 +79,7 @@ const academicUrl = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/academic-wor
                 </p>
 
                 <p>
-                    To contact me, email
+                    To contact me, email{" "}
                     <a href="mailto:lokmantsui@protonmail.com">
                         lokmantsui@protonmail.com
                     </a>.
@@ -149,7 +157,7 @@ const academicUrl = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/academic-wor
     }
 
     article {
-        max-width: 780px;
+        max-width: 900px;
     }
 
     h1 {
@@ -159,14 +167,34 @@ const academicUrl = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/academic-wor
         font-weight: 400;
     }
 
-    figure {
-        margin: 0 0 2rem;
+    .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+        align-items: start;
+        gap: 3rem;
+        margin-bottom: 2.5rem;
     }
 
-    figure img {
+    .hero figure {
+        margin: 0;
+    }
+
+    .hero img {
         display: block;
-        width: min(100%, 560px);
+        width: 100%;
         height: auto;
+    }
+
+    .tagline {
+        margin: 1rem 0 1.5rem;
+        font-size: 1.35rem;
+        line-height: 1.4;
+    }
+
+    .roles {
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.5;
     }
 
     footer {
@@ -189,6 +217,15 @@ const academicUrl = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/academic-wor
 
         main {
             padding-block: 2.5rem;
+        }
+
+        .hero {
+            display: block;
+        }
+
+        .hero figure {
+            width: min(100%, 420px);
+            margin-top: 2rem;
         }
     }
 </style>
