@@ -14,6 +14,7 @@ const sources: Source[] = [
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 const homeUrl = `${basePath}/`;
 const writingsUrl = `${basePath}/essays-and-other-writings/`;
+const academicUrl = `${basePath}/academic-work/`;
 
 function cleanList(listHtml: string) {
   return listHtml.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
@@ -88,7 +89,7 @@ const sections = await Promise.all(
 
       <nav aria-label="Primary navigation">
         <a href={homeUrl}>about</a>
-        <a href="https://www.lokman.org/academic-work/">academic work</a>
+        <a href={academicUrl}>academic work</a>
         <a href={writingsUrl}>
           essays and other writings
         </a>

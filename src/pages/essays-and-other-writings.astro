@@ -13,6 +13,7 @@ const sources: Source[] = [
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 const homeUrl = `${basePath}/`;
+const academicUrl = `${basePath}/academic-work/`;
 
 const sections = await Promise.all(
   sources.map(async (source) => {
@@ -50,7 +51,7 @@ const sections = await Promise.all(
       <a class="site-title" href={homeUrl}>lokman tsui 徐洛文</a>
       <nav aria-label="Primary navigation">
         <a href={homeUrl}>about</a>
-        <a href="https://www.lokman.org/academic-work/">academic work</a>
+        <a href={academicUrl}>academic work</a>
         <a aria-current="page" href={homeUrl + "essays-and-other-writings/"}>
           essays and other writings
         </a>
