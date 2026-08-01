@@ -1,6 +1,7 @@
 ---
 const oldSite = "https://www.lokman.org";
 const imageUrl = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/images/lokman.png`;
+const mediaUrl = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/media-appearances/`;
 ---
 
 <!doctype html>
@@ -25,9 +26,7 @@ const imageUrl = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/images/lokman.p
                 <a href={`${oldSite}/select-essays-and-other-writings/`}>
                     essays and other writings
                 </a>
-                <a href={`${oldSite}/multimedia-appearances/`}
-                    >media appearances</a
-                >
+                <a href={mediaUrl}>media appearances</a>
             </nav>
         </header>
 
